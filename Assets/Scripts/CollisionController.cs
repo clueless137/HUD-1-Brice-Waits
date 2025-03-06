@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
+using UnityEngine.UI;
 
 public class CollisionController : MonoBehaviour
 {
@@ -13,25 +15,50 @@ public class CollisionController : MonoBehaviour
 
     public AudioClip collisionAudio;
     private AudioSource audioSource;
+    public TMPro.TMP_Text scoreUI;
+    public int increaseScore = 1;
+    public int decreaseScore = 1;
+    private int score = 0;
 
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
     }
 
+    void Update()
+    {
+        if (scoreUI != null)
+        {
+            scoreUI.text = score.ToString();
+        }
+    }
+
     // only for GameObjects with a mesh, box, or other collider except for character controller and wheel colliders
     void OnCollisionEnter(Collision other)
     {
-        if(changeColor == true){
+        if (changeColor == true)
+        {
             gameObject.GetComponent<Renderer>().material.color = myColor;
         }
 
-        if(audioSource != null && !audioSource.isPlaying){
+        if (audioSource != null && !audioSource.isPlaying)
+        {
             audioSource.PlayOneShot(collisionAudio, 0.5F);
         }
 
-        if(destroyEnemy == true && other.gameObject.tag == "Enemy" || destroyCollectibles == true && other.gameObject.tag == "Collectible"){
+        if (destroyEnemy == true && other.gameObject.tag == "Enemy" || destroyCollectibles == true && other.gameObject.tag == "Collectible")
+        {
             Destroy(other.gameObject);
+        }
+        // If scoreUI has an object and the GameObject collided with is tagged a "Collectible", then set score to increase by the value of increaseScore
+        if (scoreUI != null && other.gameObject.tag == "Collectible")
+        {
+            score += increaseScore;
+        }
+        // If scoreUI has an object and the GameObject collides with is tagged an "Enemy", then set score to decrease by the value of decreaseScore
+        if (scoreUI != null && other.gameObject.tag == "Enemy")
+        {
+            score -= decreaseScore;
         }
     }
 
@@ -69,6 +96,17 @@ public class CollisionController : MonoBehaviour
         if (destroyEnemy == true && hit.gameObject.tag == "Enemy" || destroyCollectibles == true && hit.gameObject.tag == "Collectible")
         {
             Destroy(hit.gameObject);
+        }
+
+        // If scoreUI has an object and the GameObject hit is tagged a "Collectible", then set score to increase by the value of increaseScore
+        if (scoreUI != null && hit.gameObject.tag == "Collectible")
+        {
+            score += increaseScore;
+        }
+        // If scoreUI has an object and the GameObject hit is tagged a "Enemy", then set score to decrease by the value of decreaseScore
+        if (scoreUI != null && hit.gameObject.tag == "Enemy")
+        {
+            score -= decreaseScore;
         }
     }
 }
